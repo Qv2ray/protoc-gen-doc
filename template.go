@@ -2,6 +2,7 @@ package gendoc
 
 import (
 	"fmt"
+	"os"
 	"sort"
 	"strings"
 
@@ -14,7 +15,8 @@ import (
 // an object that will be supplied to a go template.
 type Template struct {
 	// The files that were parsed
-	Files []*File `json:"files"`
+	Files    []*File `json:"files"`
+	PageRoot string  `json:"pageRoot"`
 }
 
 // NewTemplate creates a Template object from a set of descriptors.
@@ -74,7 +76,7 @@ func NewTemplate(fds []*protokit.FileDescriptor) *Template {
 		files = append(files, file)
 	}
 
-	return &Template{Files: files}
+	return &Template{Files: files, PageRoot: os.Getenv("PROTOC_GEN_DOC_PAGE_ROOT")}
 }
 
 func mergeOptions(opts ...map[string]interface{}) map[string]interface{} {

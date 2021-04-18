@@ -3,6 +3,7 @@ package gendoc
 import (
 	"fmt"
 	"html/template"
+	"os"
 	"path"
 	"regexp"
 	"strings"
@@ -84,7 +85,7 @@ func TypeLinkParser(parent string, this_type string, full_type string, long_type
 	tmp = strings.ReplaceAll(tmp, ".", "/")
 	tmp = path.Dir(tmp)
 
-	return "/" + tmp + "/index.html#" + full_type
+	return "/" + os.Getenv("PROTOC_GEN_DOC_PAGE_ROOT") + "/" + tmp + "/index.html#" + full_type
 }
 
 func commonPackage(files []*File) string {
