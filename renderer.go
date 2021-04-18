@@ -71,13 +71,16 @@ func (rt RenderType) template() ([]byte, error) {
 		return fetchResource("markdown.tmpl")
 	}
 
-	return nil, errors.New("Couldn't find template for render type")
+	return nil, errors.New("couldn't find template for render type")
 }
 
 var funcMap = map[string]interface{}{
-	"p":    PFilter,
-	"para": ParaFilter,
-	"nobr": NoBrFilter,
+	"p":                PFilter,
+	"para":             ParaFilter,
+	"nobr":             NoBrFilter,
+	"makeImportLink":   ImportLinkFilter,
+	"getTypeLink":      TypeLinkParser,
+	"getCommonPackage": commonPackage,
 }
 
 // Processor is an interface that is satisfied by all built-in processors (text, html, and json).

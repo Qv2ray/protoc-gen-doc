@@ -1,7 +1,6 @@
 package gendoc
 
 import (
-	"encoding/json"
 	"fmt"
 	"sort"
 	"strings"
@@ -16,15 +15,13 @@ import (
 type Template struct {
 	// The files that were parsed
 	Files []*File `json:"files"`
-	// Details about the scalar values and their respective types in supported languages.
-	Scalars []*ScalarValue `json:"scalarValueTypes"`
 }
 
 // NewTemplate creates a Template object from a set of descriptors.
-func NewTemplate(descs []*protokit.FileDescriptor) *Template {
-	files := make([]*File, 0, len(descs))
+func NewTemplate(fds []*protokit.FileDescriptor) *Template {
+	files := make([]*File, 0, len(fds))
 
-	for _, f := range descs {
+	for _, f := range fds {
 		file := &File{
 			Name:          f.GetName(),
 			Description:   description(f.GetSyntaxComments().String()),
@@ -38,6 +35,8 @@ func NewTemplate(descs []*protokit.FileDescriptor) *Template {
 			Messages:      make(orderedMessages, 0, len(f.Messages)),
 			Services:      make(orderedServices, 0, len(f.Services)),
 			Options:       mergeOptions(extractOptions(f.GetOptions()), extensions.Transform(f.OptionExtensions)),
+			Imports:       f.Dependency,
+			HasImports:    len(f.Dependency) > 0,
 		}
 
 		for _, e := range f.Enums {
@@ -75,16 +74,7 @@ func NewTemplate(descs []*protokit.FileDescriptor) *Template {
 		files = append(files, file)
 	}
 
-	return &Template{Files: files, Scalars: makeScalars()}
-}
-
-func makeScalars() []*ScalarValue {
-	data, _ := fetchResource("scalars.json")
-
-	var scalars []*ScalarValue
-	json.Unmarshal(data, &scalars)
-
-	return scalars
+	return &Template{Files: files}
 }
 
 func mergeOptions(opts ...map[string]interface{}) map[string]interface{} {
@@ -142,7 +132,9 @@ type File struct {
 	Messages   orderedMessages   `json:"messages"`
 	Services   orderedServices   `json:"services"`
 
-	Options map[string]interface{} `json:"options,omitempty"`
+	Options    map[string]interface{} `json:"options,omitempty"`
+	Imports    []string               `json:"imports"`
+	HasImports bool                   `json:"hasImports"`
 }
 
 // Option returns the named option.
@@ -232,6 +224,7 @@ type MessageField struct {
 	Type         string `json:"type"`
 	LongType     string `json:"longType"`
 	FullType     string `json:"fullType"`
+	Package      string `json:"package"`
 	IsMap        bool   `json:"ismap"`
 	IsOneof      bool   `json:"isoneof"`
 	OneofDecl    string `json:"oneofdecl"`
@@ -418,7 +411,7 @@ func parseEnum(pe *protokit.EnumDescriptor) *Enum {
 }
 
 func parseFileExtension(pe *protokit.ExtensionDescriptor) *FileExtension {
-	t, lt, ft := parseType(pe)
+	t, lt, ft, _ := parseType(pe)
 
 	return &FileExtension{
 		Name:               pe.GetName(),
@@ -471,8 +464,8 @@ func parseMessageExtension(pe *protokit.ExtensionDescriptor) *MessageExtension {
 	}
 }
 
-func parseMessageField(pf *protokit.FieldDescriptor, oneofDecls []*descriptor.OneofDescriptorProto) *MessageField {
-	t, lt, ft := parseType(pf)
+func parseMessageField(pf *protokit.FieldDescriptor) *MessageField {
+	t, lt, ft, pkg := parseType(pf)
 
 	m := &MessageField{
 		Name:         pf.GetName(),
@@ -481,6 +474,7 @@ func parseMessageField(pf *protokit.FieldDescriptor, oneofDecls []*descriptor.On
 		Type:         t,
 		LongType:     lt,
 		FullType:     ft,
+		Package:      pkg,
 		DefaultValue: pf.GetDefaultValue(),
 		Options:      mergeOptions(extractOptions(pf.GetOptions()), extensions.Transform(pf.OptionExtensions)),
 		IsOneof:      pf.OneofIndex != nil,
@@ -555,16 +549,18 @@ type typeContainer interface {
 	GetPackage() string
 }
 
-func parseType(tc typeContainer) (string, string, string) {
+// Type, LongType, FullType, Package
+func parseType(tc typeContainer) (string, string, string, string) {
 	name := tc.GetTypeName()
 
 	if strings.HasPrefix(name, ".") {
 		name = strings.TrimPrefix(name, ".")
-		return baseName(name), strings.TrimPrefix(name, tc.GetPackage()+"."), name
+		currentPackage := tc.GetPackage()
+		return baseName(name), strings.TrimPrefix(name, tc.GetPackage()+"."), name, currentPackage
 	}
 
 	name = strings.ToLower(strings.TrimPrefix(tc.GetType().String(), "TYPE_"))
-	return name, name, name
+	return name, name, name, name
 }
 
 func description(comment string) string {

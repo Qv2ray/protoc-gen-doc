@@ -2,7 +2,7 @@
 
 <html>
   <head>
-    <title>Protocol Documentation</title>
+    <title>V2Ray proto documentations</title>
     <meta charset="UTF-8">
     <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Ubuntu:400,700,400italic"/>
     <style>
@@ -16,20 +16,18 @@
 
       h1 {
         font-weight: normal;
-        border-bottom: 1px solid #aaa;
-        padding-bottom: 0.5ex;
+        border-bottom: 1px solid #aaa; 
       }
 
       h2 {
-        border-bottom: 1px solid #aaa;
-        padding-bottom: 0.5ex;
+        border-bottom: 1px solid #aaa; 
         margin: 1.5em 0;
+        margin-bottom: 0.5em;
       }
 
       h3 {
         font-weight: normal;
-        border-bottom: 1px solid #aaa;
-        padding-bottom: 0.5ex;
+        border-bottom: 1px solid #aaa; 
       }
 
       a {
@@ -159,24 +157,35 @@
         border-radius: 1ex;
       }
     </style>
-
-    <!-- User custom CSS -->
-    <link rel="stylesheet" type="text/css" href="stylesheet.css"/>
   </head>
 
   <body>
-
-    <h1 id="title">Protocol Documentation</h1>
-
-    <h2>Table of Contents</h2>
-
-    <div id="toc-container">
+    <h1 id="title">Package <code>{{ getCommonPackage .Files }}</code></h1>
+    <p>Provided by:</p>
+    {{range .Files}}
       <ul id="toc">
-        {{range .Files}}
+        <li><a href="#file_{{.Name}}">{{.Name}}</a></li>
+      </ul>
+    {{end}}
+    {{range .Files}}
+      <div class="file-heading">
+        <h2 id="file_{{.Name}}">{{.Name}}</h2><a href="#title">Top</a>
+      </div>
+
+      {{if .HasImports}}
+        <div class="field-table">
+          <h3>Dependencies</h3>
+          {{ range makeImportLink .Imports }}
+            <p><a href="/{{.}}/index.html">{{.}}</a></p>
+          {{end}}
+        </div>
+      {{end}}
+
+      <div id="toc-container">
+        <h3>Contents</h3>
+        <ul id="toc">
           {{$file_name := .Name}}
-          <li>
-            <a href="#{{.Name}}">{{.Name}}</a>
-            <ul>
+          <li>  
               {{range .Messages}}
                 <li>
                   <a href="#{{.FullName}}"><span class="badge">M</span>{{.LongName}}</a>
@@ -196,22 +205,16 @@
                 <li>
                   <a href="#{{.FullName}}"><span class="badge">S</span>{{.Name}}</a>
                 </li>
-              {{end}}
-            </ul>
-          </li>
-        {{end}}
-        <li><a href="#scalar-value-types">Scalar Value Types</a></li>
-      </ul>
-    </div>
-
-    {{range .Files}}
-      {{$file_name := .Name}}
-      <div class="file-heading">
-        <h2 id="{{.Name}}">{{.Name}}</h2><a href="#title">Top</a>
+              {{end}} 
+          </li> 
+        </ul>
       </div>
+
+      {{$file_name := .Name}}
       {{p .Description}}
 
       {{range .Messages}}
+      {{$message := .}}
         <h3 id="{{.FullName}}">{{.LongName}}</h3>
         {{p .Description}}
 
@@ -224,7 +227,7 @@
               {{range .Fields}}
                 <tr>
                   <td>{{.Name}}</td>
-                  <td><a href="#{{.FullType}}">{{.LongType}}</a></td>
+                  <td><a href="{{getTypeLink $message.FullName .Type .FullType .LongType .Package}}">{{.LongType}}</a></td>
                   <td>{{.Label}}</td>
                   <td><p>{{if (index .Options "deprecated"|default false)}}<strong>Deprecated.</strong> {{end}}{{.Description}} {{if .DefaultValue}}Default: {{.DefaultValue}}{{end}}</p></td>
                 </tr>
@@ -410,28 +413,6 @@
         {{end -}}
       {{end}}
     {{end}}
-
-    <h2 id="scalar-value-types">Scalar Value Types</h2>
-    <table class="scalar-value-types-table">
-      <thead>
-        <tr><td>.proto Type</td><td>Notes</td><td>C++</td><td>Java</td><td>Python</td><td>Go</td><td>C#</td><td>PHP</td><td>Ruby</td></tr>
-      </thead>
-      <tbody>
-        {{range .Scalars}}
-          <tr id="{{.ProtoType}}">
-            <td>{{.ProtoType}}</td>
-            <td>{{.Notes}}</td>
-            <td>{{.CppType}}</td>
-            <td>{{.JavaType}}</td>
-            <td>{{.PythonType}}</td>
-            <td>{{.GoType}}</td>
-            <td>{{.CSharp}}</td>
-            <td>{{.PhpType}}</td>
-            <td>{{.RubyType}}</td>
-          </tr>
-        {{end}}
-      </tbody>
-    </table>
   </body>
 </html>
 
