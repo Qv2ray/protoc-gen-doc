@@ -449,7 +449,7 @@ func parseMessage(pm *protokit.Descriptor) *Message {
 	}
 
 	for _, f := range pm.Fields {
-		msg.Fields = append(msg.Fields, parseMessageField(f, pm.GetOneofDecl()))
+		msg.Fields = append(msg.Fields, parseMessageField(f))
 	}
 
 	return msg
@@ -478,10 +478,6 @@ func parseMessageField(pf *protokit.FieldDescriptor) *MessageField {
 		DefaultValue: pf.GetDefaultValue(),
 		Options:      mergeOptions(extractOptions(pf.GetOptions()), extensions.Transform(pf.OptionExtensions)),
 		IsOneof:      pf.OneofIndex != nil,
-	}
-
-	if m.IsOneof {
-		m.OneofDecl = oneofDecls[pf.GetOneofIndex()].GetName()
 	}
 
 	// Check if this is a map.
