@@ -177,7 +177,7 @@
         <div class="field-table">
           <h3>Dependencies</h3>
           {{ range makeImportLink .Imports }}
-            <p><a href="{{$root}}/{{.}}/index.html">{{.}}</a></p>
+            <p><a href="{{.}}/index.html">{{.}}</a></p>
           {{end}}
         </div>
       {{end}}
@@ -216,7 +216,7 @@
 
       {{range .Messages}}
       {{$message := .}}
-        <h4 id="{{.FullName}}">{{.LongName}}</h4>
+        <h3 id="{{.FullName}}">{{.LongName}}</h3>
         {{p .Description}}
 
         {{if .HasFields}}
