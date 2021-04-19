@@ -216,7 +216,7 @@
 
       {{range .Messages}}
       {{$message := .}}
-        <h3 id="{{.FullName}}">{{.LongName}}</h3>
+        <h4 id="{{.FullName}}">{{.LongName}}</h4>
         {{p .Description}}
 
         {{if .HasFields}}
@@ -307,7 +307,7 @@
       {{end}}
 
       {{range .Enums}}
-        <h3 id="{{.FullName}}">{{.LongName}}</h3>
+        <h4 id="{{.FullName}}">{{.LongName}}</h4>
         {{p .Description}}
         <table class="enum-table">
           <thead>
@@ -326,7 +326,7 @@
       {{end}}
 
       {{if .HasExtensions}}
-        <h3 id="{{$file_name}}-extensions">File-level Extensions</h3>
+        <h4 id="{{$file_name}}-extensions">File-level Extensions</h4>
         <table class="extension-table">
           <thead>
             <tr><td>Extension</td><td>Type</td><td>Base</td><td>Number</td><td>Description</td></tr>
@@ -346,7 +346,7 @@
       {{end}}
 
       {{range .Services}}
-        <h3 id="{{.FullName}}">{{.Name}}</h3>
+        <h4 id="{{.FullName}}">{{.Name}}</h4>
         {{p .Description}}
         <table class="enum-table">
           <thead>
