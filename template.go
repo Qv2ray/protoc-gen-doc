@@ -3,6 +3,7 @@ package gendoc
 import (
 	"fmt"
 	"os"
+	"path"
 	"sort"
 	"strings"
 
@@ -76,7 +77,7 @@ func NewTemplate(fds []*protokit.FileDescriptor) *Template {
 		files = append(files, file)
 	}
 
-	return &Template{Files: files, PageRoot: os.Getenv("PROTOC_GEN_DOC_PAGE_ROOT")}
+	return &Template{Files: files, PageRoot: path.Clean("/" + os.Getenv("PROTOC_GEN_DOC_PAGE_ROOT") + "/")}
 }
 
 func mergeOptions(opts ...map[string]interface{}) map[string]interface{} {

@@ -160,7 +160,6 @@
   </head>
 
   <body>
-    {{ $root := .PageRoot }}
     <h1 id="title">Package <code>{{ getCommonPackage .Files }}</code></h1>
     <p>Provided by:</p>
     {{range .Files}}
@@ -177,7 +176,7 @@
         <div class="field-table">
           <h3>Dependencies</h3>
           {{ range makeImportLink .Imports }}
-            <p><a href="{{$root}}/{{.}}/index.html">{{.}}</a></p>
+            <p><a href="/{{.}}/index.html">{{.}}</a></p>
           {{end}}
         </div>
       {{end}}

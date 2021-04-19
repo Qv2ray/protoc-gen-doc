@@ -43,11 +43,11 @@ func NoBrFilter(content string) string {
 func ImportLinkFilter(content []string) []string {
 	m := make(map[string]bool, len(content))
 	for _, e := range content {
-		m[path.Dir(os.Getenv("PROTOC_GEN_DOC_PAGE_ROOT") + "/" + e)] = true
+		m[path.Dir(path.Clean("/"+os.Getenv("PROTOC_GEN_DOC_PAGE_ROOT")+"/"+e))] = true
 	}
 	keys := make([]string, 0, len(m))
 	for k := range m {
-		keys = append(keys, k)
+		keys = append(keys, strings.TrimPrefix(k, "/"))
 	}
 	return keys
 }
