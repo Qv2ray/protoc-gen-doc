@@ -85,7 +85,7 @@ func TypeLinkParser(parent string, this_type string, full_type string, long_type
 	tmp = strings.ReplaceAll(tmp, ".", "/")
 	tmp = path.Dir(tmp)
 
-	return tmp + "/index.html#" + full_type
+	return "/" + tmp + "/index.html#" + full_type
 }
 
 func commonPackage(files []*File) string {
