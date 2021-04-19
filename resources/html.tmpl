@@ -216,7 +216,7 @@
 
       {{range .Messages}}
       {{$message := .}}
-        <h3 id="{{.FullName}}">{{.LongName}}</h3>
+        <h4 id="{{.FullName}}">{{.LongName}}</h4>
         {{p .Description}}
 
         {{if .HasFields}}
